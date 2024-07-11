@@ -1,0 +1,65 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Role {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String?
+  users     User[]
+}
+
+model Skill {
+  id          String      @id @default(cuid())
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  name        String?
+  description String?
+  userSkills  UserSkill[]
+}
+
+model Grade {
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  name          EnumGradeName?
+  requiredSkill String?
+  userSkills    UserSkill[]
+}
+
+model UserSkill {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  grade     Grade?   @relation(fields: [gradeId], references: [id])
+  gradeId   String?
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+  skill     Skill?   @relation(fields: [skillId], references: [id])
+  skillId   String?
+}
+
+model User {
+  id         String      @id @default(cuid())
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  firstName  String?
+  lastName   String?
+  username   String      @unique
+  email      String?     @unique
+  password   String
+  roles      Json
+  userSkills UserSkill[]
+  role       Role?       @relation(fields: [roleId], references: [id])
+  roleId     String?
+}
+
+enum EnumGradeName {
+  Option1
+}
